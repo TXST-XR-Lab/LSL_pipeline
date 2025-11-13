@@ -14,7 +14,7 @@ source_id = 'my-shimmer-1234'
 info = StreamInfo(stream_name, stream_type, channel_count, sample_rate, channel_format, source_id)
 #Add PPG later
 channels = info.desc().append_child("channels")
-ch_names = ['GSR', 'Accel_X', 'Accel_Y', 'Accel_Z']
+ch_names = ['GSR', 'PPG', 'Accel_X', 'Accel_Y', 'Accel_Z']
 ch_units = ['kOhms', 'raw', 'm/s^2', 'm/s^2', 'm/s^2'] #add 'raw'
 
 for name, unit in zip(ch_names, ch_units):
