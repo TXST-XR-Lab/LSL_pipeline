@@ -12,10 +12,10 @@ channel_format = 'float32'
 source_id = 'my-shimmer-1234'
 
 info = StreamInfo(stream_name, stream_type, channel_count, sample_rate, channel_format, source_id)
-
+#Add PPG later
 channels = info.desc().append_child("channels")
-ch_names = ['GSR', 'PPG', 'Accel_X', 'Accel_Y', 'Accel_Z']
-ch_units = ['kOhms', 'raw', 'm/s^2', 'm/s^2', 'm/s^2']
+ch_names = ['GSR', 'Accel_X', 'Accel_Y', 'Accel_Z']
+ch_units = ['kOhms', 'raw', 'm/s^2', 'm/s^2', 'm/s^2'] #add 'raw'
 
 for name, unit in zip(ch_names, ch_units):
     channels.append_child("channel") \
@@ -32,7 +32,7 @@ def shimmer_callback(pkt: DataPacket) -> None:
     global _sensor_errors
     
     try:
-        gsr_data = pkt[EChannelType.INTERNAL_ADC_13]
+        gsr_data = pkt[EChannelType.GSR_RAW]
     except Exception:
         if 'gsr' not in _sensor_errors:
             print("ERROR: GSR (INTERNAL_ADC_13) not found. Check Consensys config.")
@@ -57,7 +57,7 @@ def shimmer_callback(pkt: DataPacket) -> None:
             _sensor_errors.add('accel')
         accel_x, accel_y, accel_z = 0.0, 0.0, 0.0
 
-    try:
+    try: #add ppg later
         sample = [gsr_data, ppg_data, accel_x, accel_y, accel_z]
         outlet.push_sample(sample)
     except Exception as e:
@@ -78,6 +78,10 @@ if __name__ == '__main__':
         serial_conn = Serial(serial_port, DEFAULT_BAUDRATE)
         shim_dev = ShimmerBluetooth(serial_conn)
         shim_dev.initialize()
+
+        x,y,z = shim_dev.get_inquiry()
+        print(z)
+
         print(f"Connected to device: {shim_dev.get_device_name()}")
 
         shim_dev.add_stream_callback(shimmer_callback)
